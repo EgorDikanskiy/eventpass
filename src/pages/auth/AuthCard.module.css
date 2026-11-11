@@ -1,0 +1,108 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px var(--page-padding) 96px;
+}
+
+.heading {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.heading h1 {
+  font: var(--text-h1);
+  letter-spacing: -0.8px;
+}
+
+.heading p {
+  margin-top: 8px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 480px;
+  padding: 32px;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.forgot {
+  align-self: flex-end;
+  margin-top: -8px;
+}
+
+.note {
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  color: var(--color-accent-light);
+  font-size: 13px;
+}
+
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.footerRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding-top: 32px;
+  }
+
+  .heading h1 {
+    font: var(--text-h1-mobile);
+  }
+
+  .card {
+    padding: 24px 20px;
+  }
+}
+
+.demoList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.demoAccount {
+  padding: 6px 8px;
+  background: var(--color-raised);
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  text-align: left;
+}
+
+.demoAccount strong {
+  color: var(--color-accent-light);
+  font-weight: 500;
+}
+
+.demoAccount:hover {
+  background: #2f3440;
+}

@@ -1,0 +1,127 @@
+name: eventpass
+
+x-backend: &backend
+  image: eventpass-backend
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  environment:
+    DATABASE_URL: postgresql://eventpass:${POSTGRES_PASSWORD:-eventpass-local}@postgres:5432/eventpass
+    FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8090}
+    RABBITMQ_URL: amqp://eventpass:${RABBITMQ_PASSWORD:-eventpass-local}@rabbitmq:5672/%2F
+    S3_ENDPOINT_URL: http://s3:8333
+    S3_BUCKET: eventpass
+    AWS_ACCESS_KEY_ID: eventpass
+    AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-eventpass-local-secret}
+    AWS_DEFAULT_REGION: us-east-1
+    PDF_FONT_PATH: /usr/share/fonts/dejavu/DejaVuSans.ttf
+    EVENTPASS_TIMEZONE: ${EVENTPASS_TIMEZONE:-Europe/Moscow}
+    SMTP_HOST: ${SMTP_HOST:-mailpit}
+    SMTP_PORT: ${SMTP_PORT:-1025}
+    SMTP_STARTTLS: ${SMTP_STARTTLS:-false}
+    SMTP_FROM: ${SMTP_FROM:-eventpass@example.com}
+    SMTP_USERNAME: ${SMTP_USERNAME:-}
+    SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  restart: unless-stopped
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: deploy/frontend.Dockerfile
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-8090}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend:
+    <<: *backend
+    depends_on:
+      s3-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8080/api/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  worker:
+    <<: *backend
+    command: ["python", "-m", "backend.worker"]
+    depends_on:
+      backend:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+      s3:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: eventpass
+      POSTGRES_USER: eventpass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventpass-local}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventpass -d eventpass"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: eventpass
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-eventpass-local}
+    hostname: eventpass-rabbitmq
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  s3-init:
+    <<: *backend
+    command: ["python", "-m", "backend.storage"]
+    restart: "no"
+    depends_on:
+      s3:
+        condition: service_started
+
+  s3:
+    image: chrislusf/seaweedfs:4.17
+    command: ["mini", "-dir=/data"]
+    environment:
+      AWS_ACCESS_KEY_ID: eventpass
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-eventpass-local-secret}
+    volumes:
+      - s3:/data
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    environment:
+      MP_DATABASE: /data/mailpit.db
+    ports:
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
+    volumes:
+      - mail:/data
+    restart: unless-stopped
+
+volumes:
+  postgres:
+  rabbitmq:
+  s3:
+  mail:

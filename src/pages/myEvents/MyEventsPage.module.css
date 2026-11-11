@@ -1,0 +1,84 @@
+.tabs {
+  margin-bottom: 24px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+}
+
+.cardTop,
+.volunteerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+
+.cardTop {
+  align-items: flex-start;
+}
+
+.cardMain {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cardTitle {
+  font: var(--text-card-title);
+}
+
+.cardMeta {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.stats {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+
+.stats dt {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.stats dd {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit {
+  font: var(--text-body);
+  font-size: 13px;
+}

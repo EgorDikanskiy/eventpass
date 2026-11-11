@@ -1,0 +1,22 @@
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  opacity: 0.8;
+  animation: spin 0.7s linear infinite;
+}
+
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  color: var(--color-accent-light);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

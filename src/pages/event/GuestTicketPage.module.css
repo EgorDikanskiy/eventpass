@@ -1,0 +1,84 @@
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  max-width: calc(900px + 2 * var(--page-padding));
+  margin: 0 auto;
+  padding: 48px var(--page-padding) 80px;
+}
+
+.ticket,
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+}
+
+.ticket {
+  flex: 1 1 380px;
+  max-width: 437px;
+}
+
+.account {
+  flex: 1 1 380px;
+  max-width: 439px;
+  border: 1px solid var(--color-accent);
+}
+
+.ticketHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code {
+  color: var(--color-muted);
+  font: var(--text-label);
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font: var(--text-h2);
+}
+
+.meta {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.qr {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.hint {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.sent {
+  color: var(--color-success);
+  font-size: 12px;
+}
+
+.account h2 {
+  font: var(--text-card-title);
+  font-size: 17px;
+}
+
+.account p {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.resend {
+  align-self: flex-start;
+}

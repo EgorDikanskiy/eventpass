@@ -1,0 +1,63 @@
+/*
+ * Дизайн-токены из UI-кита макета (Figma → «06 · UI-кит»).
+ * Все цвета, радиусы и тени берутся только отсюда.
+ */
+:root {
+  /* Поверхности */
+  --color-bg: #0f131c;            /* фон страницы, шапка */
+  --color-card: #181b25;          /* карточки, сегмент-контрол */
+  --color-surface: #1c1f29;       /* поля ввода, вложенные блоки */
+  --color-raised: #262a34;        /* вторичные кнопки, бейджи, активный пункт меню */
+  --color-footer: #0a0e17;
+  --color-border: #262a34;
+
+  /* Акцент */
+  --color-accent: #8083ff;        /* основная кнопка, выбранный вариант */
+  --color-accent-light: #c0c1ff;  /* ссылки, активный таб, аватар */
+  --color-on-accent: #0d0096;     /* текст на основной кнопке */
+  --color-accent-soft: rgba(128, 131, 255, 0.12);
+
+  /* Текст */
+  --color-text: #dfe2ef;
+  --color-text-secondary: #c7c4d7;
+  --color-muted: #908fa0;
+
+  /* Статусы */
+  --color-success: #34d399;
+  --color-success-soft: rgba(52, 211, 153, 0.14);
+  --color-warning: #fbbf24;
+  --color-warning-soft: rgba(251, 191, 36, 0.14);
+  --color-danger: #f87171;
+  --color-danger-soft: rgba(248, 113, 113, 0.14);
+  --color-orange: #ffb783;        /* «Осталось N мест» */
+
+  /* Типографика */
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-h1: 700 32px/40px var(--font-sans);
+  --text-h1-mobile: 700 26px/32px var(--font-sans);
+  --text-h2: 600 24px/32px var(--font-sans);
+  --text-card-title: 600 18px/26px var(--font-sans);
+  --text-body: 500 14px/20px var(--font-sans);
+  --text-description: 400 14px/20px var(--font-sans);
+  --text-label: 500 12px/16px var(--font-sans);
+  --text-hint: 400 12px/18px var(--font-sans);
+
+  /* Скругления и отступы */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  --header-height: 64px;
+  --container-width: 1280px;
+  --content-width: 896px;
+  --page-padding: 32px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --page-padding: 16px;
+  }
+}

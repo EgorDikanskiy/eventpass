@@ -1,0 +1,25 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*.local
+
+# логи
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# редакторы
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+test-results/
+playwright-report/

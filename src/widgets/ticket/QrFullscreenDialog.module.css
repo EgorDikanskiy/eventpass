@@ -1,0 +1,36 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 70vh;
+  text-align: center;
+}
+
+.title {
+  color: var(--color-text);
+  font: var(--text-h2);
+}
+
+.meta {
+  margin-bottom: 16px;
+  color: var(--color-text-secondary);
+}
+
+.code {
+  margin-top: 16px;
+  color: var(--color-text);
+  font: var(--text-card-title);
+  letter-spacing: 1px;
+}
+
+.holder {
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  max-width: 320px;
+  color: var(--color-muted);
+  font-size: 13px;
+}

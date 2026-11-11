@@ -1,0 +1,114 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font: var(--text-h2);
+}
+
+.qrIcon {
+  color: var(--color-accent-light);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
+.profileLabel {
+  color: var(--color-text-secondary);
+  font: var(--text-label);
+}
+
+.profileValue {
+  font: var(--text-body);
+  overflow-wrap: anywhere;
+}
+
+.profileLink {
+  font: var(--text-label);
+  font-size: 13px;
+}
+
+.delivery {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+@media (max-width: 1024px) {
+  .card {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .card {
+    padding: 24px 20px;
+  }
+}
+
+.select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: var(--text-body);
+}
+
+.select[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.multiple {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.optionHint {
+  display: block;
+  color: var(--color-text-secondary);
+  font: var(--text-hint);
+}
