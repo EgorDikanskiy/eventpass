@@ -35,6 +35,18 @@ npm test
 
 При других портах задайте `EVENTPASS_TEST_URL` и `EVENTPASS_MAIL_URL`. Для повторной проверки в браузере с нуля можно использовать отдельный проект Compose с другими портами.
 
+## Релиз на VPS
+
+Создайте в GitHub ветку `release/1.2.3` из нужного коммита. Из терминала это можно сделать так:
+
+```bash
+git push origin HEAD:refs/heads/release/1.2.3
+```
+
+[Workflow в GitHub Actions](.github/workflows/deploy-release.yml) собирает образы и передаёт их на VPS по SSH. Сервер запускает Compose, проверяет главную страницу и `/api/health`. При ошибке запуска или проверки он возвращает предыдущие образы и конфигурацию. Следующие пуши в уже созданную ветку не запускают деплой.
+
+Для подключения другого VPS установите `deploy/receive-release.sh` в `/usr/local/sbin/eventpass-receive-release`. Добавьте отдельный ключ деплоя в `authorized_keys` с опциями `restrict,command="/usr/local/sbin/eventpass-receive-release"`. В настройках Actions задайте секрет `EVENTPASS_DEPLOY_KEY` с закрытым ключом и переменные `EVENTPASS_DEPLOY_HOST` и `EVENTPASS_DEPLOY_KNOWN_HOSTS` с адресом и проверенной записью SSH-хоста. Скрипт обновляет уже запущенный Compose в `/opt/eventpass` и использует его `.env` и тома.
+
 ## Стек
 
 | Что | Чем |

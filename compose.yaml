@@ -26,6 +26,7 @@ x-backend: &backend
 
 services:
   frontend:
+    image: eventpass-frontend
     build:
       context: .
       dockerfile: deploy/frontend.Dockerfile
