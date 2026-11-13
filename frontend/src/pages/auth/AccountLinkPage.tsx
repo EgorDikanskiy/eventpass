@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api, getErrorMessage } from '@/api';
+import { tokenStorage } from '@/api/tokenStorage';
 import { useAuth } from '@/app/AuthProvider';
 import { queryKeys } from '@/features/queryKeys';
 import { useDocumentTitle } from '@/shared/lib/useDocumentTitle';
@@ -78,7 +79,7 @@ export function AccountLinkPage() {
       if (needsPassword && user) await signOut();
       if (!needsPassword) await queryClient.invalidateQueries({ queryKey: queryKeys.me });
       toast(needsPassword ? 'Пароль сохранён' : 'Почта подтверждена', 'success');
-      navigate(!needsPassword && user ? '/profile' : '/login', { replace: true });
+      navigate(!needsPassword && tokenStorage.get() ? '/profile' : '/login', { replace: true });
     } catch (requestError) {
       setError(getErrorMessage(requestError));
     } finally {
