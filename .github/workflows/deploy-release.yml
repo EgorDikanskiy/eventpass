@@ -10,42 +10,56 @@ defaults:
     shell: bash
 
 jobs:
-  deploy:
+  select-target:
     if: github.event.ref_type == 'branch' && startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    concurrency:
-      group: eventpass-production
-      cancel-in-progress: false
-
+    outputs:
+      target: ${{ steps.release.outputs.target }}
     steps:
-      - name: Check release branch name
+      - name: Select environment from the branch name
         id: release
         env:
           RELEASE_BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "$RELEASE_BRANCH" =~ ^release/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo 'valid=true' >> "$GITHUB_OUTPUT"
+          if [[ "$RELEASE_BRANCH" =~ ^release/stage/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'target=staging' >> "$GITHUB_OUTPUT"
+          elif [[ "$RELEASE_BRANCH" =~ ^release/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'target=production' >> "$GITHUB_OUTPUT"
           fi
 
+  deploy:
+    needs: select-target
+    if: needs.select-target.outputs.target != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    concurrency:
+      group: eventpass-${{ needs.select-target.outputs.target }}
+      cancel-in-progress: false
+
+    steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: steps.release.outputs.valid == 'true'
         with:
           persist-credentials: false
 
       - name: Build release images
-        if: steps.release.outputs.valid == 'true'
+        env:
+          EVENTPASS_FRONTEND_IMAGE: ${{ needs.select-target.outputs.target == 'staging' && 'eventpass-staging-frontend' || 'eventpass-frontend' }}
+          EVENTPASS_BACKEND_IMAGE: ${{ needs.select-target.outputs.target == 'staging' && 'eventpass-staging-backend' || 'eventpass-backend' }}
         run: docker compose build frontend backend
 
       - name: Deploy to the VPS
-        if: steps.release.outputs.valid == 'true'
         env:
           DEPLOY_HOST: ${{ vars.EVENTPASS_DEPLOY_HOST }}
           DEPLOY_KNOWN_HOSTS: ${{ vars.EVENTPASS_DEPLOY_KNOWN_HOSTS }}
           DEPLOY_KEY: ${{ secrets.EVENTPASS_DEPLOY_KEY }}
+          STAGING_DEPLOY_KEY: ${{ secrets.EVENTPASS_STAGING_DEPLOY_KEY }}
+          DEPLOY_TARGET: ${{ needs.select-target.outputs.target }}
         run: |
           : "${DEPLOY_HOST:?Missing EVENTPASS_DEPLOY_HOST}"
           : "${DEPLOY_KNOWN_HOSTS:?Missing EVENTPASS_DEPLOY_KNOWN_HOSTS}"
+          if [[ "$DEPLOY_TARGET" == staging ]]; then
+            DEPLOY_KEY=${STAGING_DEPLOY_KEY:?Missing EVENTPASS_STAGING_DEPLOY_KEY}
+          fi
           : "${DEPLOY_KEY:?Missing EVENTPASS_DEPLOY_KEY}"
           umask 077
           release_dir=$(mktemp -d)
@@ -54,7 +68,11 @@ jobs:
           printf '%s\n' "$DEPLOY_KEY" > "$release_dir/ssh_key"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$release_dir/known_hosts"
           cp compose.yaml "$release_dir/compose.yaml"
-          docker image save eventpass-frontend:latest eventpass-backend:latest \
+          image_prefix=eventpass
+          if [[ "$DEPLOY_TARGET" == staging ]]; then
+            image_prefix=eventpass-staging
+          fi
+          docker image save "$image_prefix-frontend:latest" "$image_prefix-backend:latest" \
             | gzip -1 > "$release_dir/images.tar.gz"
 
           tar -C "$release_dir" -cf - compose.yaml images.tar.gz \

@@ -28,6 +28,7 @@ FastAPI обслуживает REST API, а PostgreSQL хранит аккаун
 Тесты используют запущенный Compose и Chromium. Они создают отдельные аккаунты и мероприятия со случайными идентификаторами.
 
 ```bash
+cd frontend
 npm ci
 npx playwright install chromium
 npm test
@@ -56,7 +57,7 @@ git push origin HEAD:refs/heads/release/1.2.3
 | Роутинг | React Router 7 |
 | Данные с сервера | TanStack Query 5 (кэш, загрузка, мутации) |
 | Сессия | React Context (`AuthProvider`) |
-| Стили | CSS Modules + CSS-переменные из UI-кита (`src/styles/tokens.css`) |
+| Стили | CSS Modules + CSS-переменные из UI-кита (`frontend/src/styles/tokens.css`) |
 | Иконки | lucide-react |
 | QR | qrcode.react |
 
@@ -67,6 +68,7 @@ Redux и другие стейт-менеджеры не используютс�
 Нужен **Node.js 20.19+** (проверено на Node 24, npm 11).
 
 ```bash
+cd frontend
 npm install
 cp .env.example .env      # на Windows: copy .env.example .env  (необязательно — по умолчанию моки)
 npm run dev
@@ -133,3 +135,32 @@ docs/             документация проекта
 ## Что не входит в MVP
 
 По макету (секция 05 «План-максимум») не делаются каталог мероприятий и аналитика. Также пока нет: мобильного приложения и приёма оплаты. Переключатель «Платно» задаёт отметку на странице мероприятия.
+
+## Структура серверной части
+
+- `backend/api` — маршруты FastAPI, зависимости авторизации и HTTP-контракты.
+- `backend/models` — модели запросов и ответов.
+- `backend/services` — правила мероприятий, обработка анкет, экспорт, обложки и уведомления.
+- `backend/infrastructure` — PostgreSQL, миграции, RabbitMQ, SMTP и S3.
+- `frontend` — React-приложение, сценарии Playwright и конфигурация Vite.
+
+
+## Staging для Android
+
+- API: [staging.eventpass.dikanskii.ru/api](https://staging.eventpass.dikanskii.ru/api).
+- [OpenAPI](https://staging.eventpass.dikanskii.ru/api/openapi.json) и [Swagger UI](https://staging.eventpass.dikanskii.ru/api/docs).
+- Compose-проект на VPS: `eventpass-staging`, каталог `/opt/eventpass-staging`. У него отдельные тома PostgreSQL, S3, RabbitMQ и Mailpit.
+- Для просмотра тестовой почты откройте SSH-туннель: `ssh -N -L 18025:127.0.0.1:18025 user@server`. Веб-интерфейс Mailpit откроется на [localhost:18025](http://localhost:18025).
+- Для App Links задайте `ANDROID_APPLICATION_ID` и `ANDROID_CERT_FINGERPRINTS` в файле окружения staging и пересоздайте контейнеры через Compose. Используйте отпечатки сертификатов, которыми подписаны устанавливаемые Android-сборки.
+
+### Как выложить на staging
+
+Создайте ветку `release/stage/X.Y.Z` из нужного коммита. После проверки создайте production-ветку от того же коммита.
+
+```bash
+git push origin HEAD:refs/heads/release/stage/1.1.0
+git fetch origin
+git push origin origin/release/stage/1.1.0:refs/heads/release/1.1.0
+```
+
+Выкладки видны в GitHub Actions. Staging использует отдельный секрет `EVENTPASS_STAGING_DEPLOY_KEY` и обработчик `/usr/local/sbin/eventpass-receive-staging staging`. Production использует свой ключ и каталог `/opt/eventpass`.

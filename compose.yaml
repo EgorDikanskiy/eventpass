@@ -1,12 +1,18 @@
 name: eventpass
 
 x-backend: &backend
-  image: eventpass-backend
+  image: ${EVENTPASS_BACKEND_IMAGE:-eventpass-backend}
   build:
     context: .
     dockerfile: backend/Dockerfile
   environment:
     DATABASE_URL: postgresql://eventpass:${POSTGRES_PASSWORD:-eventpass-local}@postgres:5432/eventpass
+    TERMS_URL: ${TERMS_URL:-}
+    TERMS_VERSION: ${TERMS_VERSION:-}
+    PRIVACY_URL: ${PRIVACY_URL:-}
+    PRIVACY_VERSION: ${PRIVACY_VERSION:-}
+    ANDROID_APPLICATION_ID: ${ANDROID_APPLICATION_ID:-}
+    ANDROID_CERT_FINGERPRINTS: ${ANDROID_CERT_FINGERPRINTS:-}
     FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8090}
     RABBITMQ_URL: amqp://eventpass:${RABBITMQ_PASSWORD:-eventpass-local}@rabbitmq:5672/%2F
     S3_ENDPOINT_URL: http://s3:8333
@@ -26,7 +32,7 @@ x-backend: &backend
 
 services:
   frontend:
-    image: eventpass-frontend
+    image: ${EVENTPASS_FRONTEND_IMAGE:-eventpass-frontend}
     build:
       context: .
       dockerfile: deploy/frontend.Dockerfile
@@ -52,7 +58,7 @@ services:
 
   worker:
     <<: *backend
-    command: ["python", "-m", "backend.worker"]
+    command: ["python", "-m", "backend.infrastructure.worker"]
     depends_on:
       backend:
         condition: service_healthy
@@ -95,7 +101,7 @@ services:
 
   s3-init:
     <<: *backend
-    command: ["python", "-m", "backend.storage"]
+    command: ["python", "-m", "backend.infrastructure.storage"]
     restart: "no"
     depends_on:
       s3:

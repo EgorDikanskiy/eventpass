@@ -2,7 +2,15 @@
 set -euo pipefail
 
 [[ ${SSH_ORIGINAL_COMMAND:-} == deploy ]]
-cd /opt/eventpass
+case "${1:-production}" in
+  production) project=eventpass ;;
+  staging) project=eventpass-staging ;;
+  *) exit 1 ;;
+esac
+
+cd "/opt/$project"
+frontend_image="$project-frontend:latest"
+backend_image="$project-backend:latest"
 exec 9>.release.lock
 flock 9
 
@@ -10,12 +18,12 @@ release_dir=$(mktemp -d .release.XXXXXX)
 trap 'rm -rf "$release_dir"' EXIT
 
 tar -xf - -C "$release_dir" -- compose.yaml images.tar.gz
-next_compose=(docker compose --project-directory "$PWD" -f "$release_dir/compose.yaml")
-current_compose=(docker compose -f compose.yaml)
+next_compose=(docker compose -p "$project" --project-directory "$PWD" -f "$release_dir/compose.yaml")
+current_compose=(docker compose -p "$project" -f compose.yaml)
 "${next_compose[@]}" config --quiet
 
-previous_frontend=$(docker image inspect --format '{{.Id}}' eventpass-frontend:latest)
-previous_backend=$(docker image inspect --format '{{.Id}}' eventpass-backend:latest)
+previous_frontend=$(docker image inspect --format '{{.Id}}' "$frontend_image")
+previous_backend=$(docker image inspect --format '{{.Id}}' "$backend_image")
 
 check_frontend() {
   local frontend_address
@@ -38,8 +46,8 @@ if docker image load -i "$release_dir/images.tar.gz" \
   done
 else
   echo 'Deployment failed. Restoring the previous EventPass images.' >&2
-  docker image tag "$previous_frontend" eventpass-frontend:latest
-  docker image tag "$previous_backend" eventpass-backend:latest
+  docker image tag "$previous_frontend" "$frontend_image"
+  docker image tag "$previous_backend" "$backend_image"
   "${current_compose[@]}" up -d --no-build --pull never --wait --wait-timeout 120
   exit 1
 fi

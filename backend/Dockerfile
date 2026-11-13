@@ -6,4 +6,4 @@ COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/ backend/
 USER eventpass
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]
+CMD ["uvicorn", "backend.api.main:app", "--host", "0.0.0.0", "--port", "8080", "--forwarded-allow-ips=*", "--no-access-log"]
