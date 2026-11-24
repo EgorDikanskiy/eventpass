@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: '**/ui/**',
   timeout: 90_000,
   use: {
     baseURL: process.env.EVENTPASS_TEST_URL ?? 'http://localhost:8090',

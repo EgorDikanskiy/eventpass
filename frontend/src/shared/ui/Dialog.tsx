@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import styles from './Dialog.module.css';
 
 interface DialogProps {
@@ -15,6 +15,7 @@ interface DialogProps {
 /** Модальное окно на нативном <dialog>: фокус, Esc и затемнение «из коробки». */
 export function Dialog({ open, onClose, title, children, footer, fullscreen }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -26,6 +27,7 @@ export function Dialog({ open, onClose, title, children, footer, fullscreen }: D
   return (
     <dialog
       ref={ref}
+      aria-labelledby={title ? titleId : undefined}
       className={fullscreen ? styles.fullscreen : styles.dialog}
       onClose={onClose}
       onClick={(event) => {
@@ -35,7 +37,7 @@ export function Dialog({ open, onClose, title, children, footer, fullscreen }: D
       {open && (
         <div className={styles.body}>
           <div className={styles.header}>
-            {title && <h2 className={styles.title}>{title}</h2>}
+            {title && <h2 id={titleId} className={styles.title}>{title}</h2>}
             <button type="button" className={styles.close} onClick={onClose} aria-label="Закрыть">
               <X size={20} />
             </button>

@@ -184,6 +184,8 @@
   }
 
   .headerActions {
+    width: 100%;
+    min-width: 0;
     justify-content: flex-start;
   }
 }

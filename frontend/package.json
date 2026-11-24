@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:ui": "playwright test -c playwright.ui.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.6",
