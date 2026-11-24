@@ -6,14 +6,9 @@ import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/mock/demoAccounts';
 import { useAuth } from '@/app/AuthProvider';
 import type { LoginLocationState } from '@/features/pendingRegistration';
 import { useDocumentTitle } from '@/shared/lib/useDocumentTitle';
+import { safeReturnUrl } from '@/shared/lib/safeReturnUrl';
 import { Button, Field, Input, Notice, PasswordInput, PageLoader, useToast } from '@/shared/ui';
 import styles from './AuthCard.module.css';
-
-/** Разрешаем возврат только на свои страницы, чтобы ?returnUrl нельзя было подменить внешней ссылкой. */
-function safeReturnUrl(value: string | null): string | null {
-  if (!value?.startsWith('/') || /^\/[\\/]/.test(value)) return null;
-  return new URL(value, window.location.origin).origin === window.location.origin ? value : null;
-}
 
 /**
  * «Вход» и «Вход: почта уже зарегистрирована».
@@ -85,7 +80,7 @@ export function LoginPage() {
         <h1>Вход в EventPass</h1>
         {!pending && (
           <p>
-            Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+            Нет аккаунта? <Link to={returnUrl ? `/register?returnUrl=${encodeURIComponent(returnUrl)}` : '/register'}>Зарегистрироваться</Link>
           </p>
         )}
       </div>

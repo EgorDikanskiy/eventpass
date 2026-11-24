@@ -308,7 +308,14 @@
 
 .preview {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+}
+
+/* The dialog already supplies the card background and padding. */
+.preview > form {
+  padding: 0;
+  box-shadow: none;
 }
 
 .preview > p {

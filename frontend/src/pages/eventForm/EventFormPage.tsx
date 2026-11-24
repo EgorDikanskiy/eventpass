@@ -144,10 +144,12 @@ function EventForm({ event }: { event?: EventDetails }) {
                 />
               )}
             </Field>
-            <Field label="Описание" hint="Показывается на публичной странице под названием">
-              {(id) => (
+            <Field label="Описание" error={errors.description} hint="Показывается на публичной странице под названием">
+              {(id, describedBy) => (
                 <Textarea
                   id={id}
+                  invalid={!!errors.description}
+                  aria-describedby={describedBy}
                   rows={3}
                   placeholder="О чём мероприятие и кому будет интересно"
                   value={form.description}

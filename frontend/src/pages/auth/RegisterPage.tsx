@@ -1,9 +1,10 @@
 import { ShieldCheck } from 'lucide-react';
 import { useRef, useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, getErrorMessage, isApiError } from '@/api';
 import { useAuth } from '@/app/AuthProvider';
 import { useDocumentTitle } from '@/shared/lib/useDocumentTitle';
+import { safeReturnUrl } from '@/shared/lib/safeReturnUrl';
 import { Button, Checkbox, Field, Input, Notice, PasswordInput, PageLoader, useToast } from '@/shared/ui';
 import styles from './AuthCard.module.css';
 
@@ -14,6 +15,8 @@ export function RegisterPage() {
   const { status, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [params] = useSearchParams();
+  const returnUrl = safeReturnUrl(params.get('returnUrl'));
   const toast = useToast();
   const prefill = (location.state as { email?: string; fullName?: string } | null) ?? {};
 
@@ -26,7 +29,7 @@ export function RegisterPage() {
   useDocumentTitle('Регистрация');
 
   if (status === 'loading') return <PageLoader />;
-  if (status === 'authenticated' && !finishing.current) return <Navigate to="/tickets" replace />;
+  if (status === 'authenticated' && !finishing.current) return <Navigate to={returnUrl ?? '/tickets'} replace />;
 
   function update(field: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -50,7 +53,7 @@ export function RegisterPage() {
       finishing.current = true;
       signIn(session);
       toast('Аккаунт создан. Мы отправили письмо для подтверждения почты', 'success');
-      navigate('/tickets', { replace: true });
+      navigate(returnUrl ?? '/tickets', { replace: true });
     } catch (error) {
       if (isApiError(error) && error.fields) setErrors(error.fields as Errors);
       setFormError(getErrorMessage(error));
@@ -64,7 +67,7 @@ export function RegisterPage() {
       <div className={styles.heading}>
         <h1>Создать аккаунт</h1>
         <p>
-          Уже есть аккаунт? <Link to="/login">Войти</Link>
+          Уже есть аккаунт? <Link to={returnUrl ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : '/login'}>Войти</Link>
         </p>
       </div>
 
